@@ -1,8 +1,11 @@
 from django.conf.urls import patterns, url, include
-from RangoApp.views import index
+from RangoApp import views
 from about.views import first
 from contact.views import info
 
-urlpatterns = patterns('', url(r'^$', index, name='index'),
+urlpatterns = patterns('', url(r'^$', views.index, name='index'),
                        url(r'^about/', first, name='about'),
-                       url(r'^contact/', info, name='contact'))
+                       url(r'^contact/', info, name='contact'),
+                       url(r'^add_category/$', views.add_category, name='add_category'),
+                       url(r'^category/(?P<category_name_slug>[\w\-]+)/add_page/$', views.add_page, name='add_page'),
+                       url(r'^category/(?P<category_name_slug>[\w\-]+)/$', views.category, name='category'),)

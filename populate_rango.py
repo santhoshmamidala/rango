@@ -1,49 +1,57 @@
 import os
+import django
+from RangoApp.models import Category, Page
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'rango.settings')
 
-import django
 django.setup()
 
-from RangoApp.models import Category, Page
 
 def populate():
-    python_cat = add_cat('Python')
+    python_cat = add_cat('Python', 128, 64)
 
     add_page(cat=python_cat,
-             title = "Official Python Tutorial",
-             url = "http://docs.python.org/2/tutorial/")
+             title="Official Python Tutorial",
+             url="http://docs.python.org/2/tutorial/",
+             views=23)
 
     add_page(cat=python_cat,
              title="How to Think like a Computer Scientist",
-             url="http://www.greenteapress.com/thinkpython/")
+             url="http://www.greenteapress.com/thinkpython/",
+             views=43)
 
     add_page(cat=python_cat,
              title='Learn Python',
-             url='http://')
+             url='http://',
+             views=191)
 
-    django_cat = add_cat("Django")
+    django_cat = add_cat("Django", 64, 32)
 
     add_page(cat=django_cat,
              title="Official Django Tutorial",
-             url="https://docs.djangoproject.com/en/1.5/intro/tutorial01/")
+             url="https://docs.djangoproject.com/en/1.5/intro/tutorial01/",
+             views=32)
 
     add_page(cat=django_cat,
              title="Django Rocks",
-             url="http://www.djangorocks.com/")
+             url="http://www.djangorocks.com/",
+             views=28)
 
     add_page(cat=django_cat,
              title="How to Tango with Django",
-             url="http://www.tangowithdjango.com/")
+             url="http://www.tangowithdjango.com/",
+             views=74)
 
-    frame_cat = add_cat("Other Frameworks")
+    frame_cat = add_cat("Other Frameworks", 32, 16)
 
     add_page(cat=frame_cat,
              title="Bottle",
-             url="http://bottlepy.org/docs/dev/")
+             url="http://bottlepy.org/docs/dev/",
+             views=92)
 
     add_page(cat=frame_cat,
              title="Flask",
-             url="http://flask.pocoo.org")
+             url="http://flask.pocoo.org",
+             views=24)
 
     # Print out what we have added to the user.
     for c in Category.objects.all():
@@ -59,8 +67,11 @@ def add_page(cat, title, url, views=0):
     return p
 
 
-def add_cat(name):
+def add_cat(name, views, likes):
     c = Category.objects.get_or_create(name=name)[0]
+    c.views = views
+    c.likes = likes
+    c.save()
     return c
 
 
