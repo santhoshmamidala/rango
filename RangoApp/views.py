@@ -5,15 +5,47 @@ from RangoApp.form import CategoryForm, PageForm, UserForm, UserProfileForm
 from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
+from datetime import datetime
+
 
 def index(request):
-    #return HttpResponse("Rango says 'Hey there world!'<br/> "
-    #                    "<a href='/RangoApp/about'>About</a><br/>"
-    #                    "<a href='/RangoApp/contact'>Contact</a>")
-    category_list = Category.objects.order_by('-likes')[:5]
+
+    category_list = Category.objects.all()
     page_list = Page.objects.order_by('-views')[:5]
     context_dict = {'categories': category_list, 'pages': page_list}
-    return render(request, 'RangoApp/index.html', context_dict)
+
+    visits = request.session.get('visits')
+    if not visits:
+        visits = 1
+    reset_last_visit_time = False
+
+    last_visit = request.session.get('last_visit')
+    if last_visit:
+        last_visit_time = datetime.strptime(last_visit[:-7], "%Y-%m-%d %H:%M:%S")
+
+        if (datetime.now() - last_visit_time).seconds > 0:
+            # increment number of visits
+            visits += 1
+            # update last visit cookie
+            reset_last_visit_time = True
+
+    else:
+        # Cookie last_visit doesn't exist, so create it to the current date/time.
+        reset_last_visit_time = True
+
+    if reset_last_visit_time:
+        request.session['last_visit'] = str(datetime.now())
+        request.session['visits'] = visits
+    context_dict['visits'] = visits
+
+    response = render(request, 'RangoApp/index.html', context_dict)
+
+    return response
+
+
+def about(request):
+    return render(request, 'RangoApp/about.html', {})
+
 
 def category(request, category_name_slug):
     # context dictionary which is passed to template rendering engine.
@@ -42,6 +74,7 @@ def category(request, category_name_slug):
 
     return render(request, 'RangoApp/category.html', context_dict)
 
+
 def add_category(request):
     # A HTTP POST?
     if request.method == 'POST':
@@ -64,6 +97,7 @@ def add_category(request):
     # Bad form (or form details), no form supplied...
     # Render the form with error messages (if any).
     return render(request, 'RangoApp/add_category.html', {'form': form})
+
 
 def add_page(request, category_name_slug):
 
@@ -93,6 +127,7 @@ def add_page(request, category_name_slug):
 
     return render(request, 'RangoApp/add_page.html', context_dict)
 
+
 def register(request):
     # A boolean value for telling the template whether the registration was successful.
     # Set to False initially. Code changes value to True when registration succeeds.
@@ -115,7 +150,7 @@ def register(request):
             # Now sort out the UserProfile instance.
             # Since we need to set the user attribute ourselves, we set commit=False.
             # This delays saving the model until we're ready
-            profile =profile_form.save(commit=False)
+            profile = profile_form.save(commit=False)
             profile.user = user
 
             if 'picture' in request.FILES:
@@ -162,9 +197,12 @@ def user_login(request):
     else:
         return render(request, 'RangoApp/login.html', {})
 
+
 @login_required
 def restricted(request):
-    return HttpResponse("Since you're logged in, you can see this text")
+    # return HttpResponse("Since you're logged in, you can see this text")
+    return render(request, 'RangoApp/restricted.html', {})
+
 
 @login_required
 def user_logout(request):
