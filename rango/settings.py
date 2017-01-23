@@ -38,6 +38,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'RangoApp',
     'about',
+    'registration',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -105,4 +106,10 @@ PASSWORD_HASHERS = (
     'django.contrib.auth.hashers.PBKDF2PasswordHasher',
     'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',)
 
-LOGIN_URL = '/RangoApp/login/'
+#LOGIN_URL = '/RangoApp/login/'
+
+REGISTRATION_OPEN = True
+ACCOUNT_ACTIVATION_DAYS = 7
+REGISTRATION_AUTO_LOGIN = True
+LOGIN_REDIRECT_URL = '/RangoApp/'
+LOGIN_URL = '/accounts/login/'
