@@ -6,7 +6,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 from datetime import datetime
-
+from django.shortcuts import redirect
 
 def index(request):
 
@@ -65,7 +65,7 @@ def category(request, category_name_slug):
 
         # Retrieve all of the associated pages.
         # Note that filter returns >= 1 model instance.
-        pages = Page.objects.filter(category=category)
+        pages = Page.objects.filter(category=category).order_by('-views')
 
         # Adds our results list to the template context under name pages.
         context_dict['pages'] = pages
@@ -137,3 +137,19 @@ def add_page(request, category_name_slug):
 def restricted(request):
     # return HttpResponse("Since you're logged in, you can see this text")
     return render(request, 'RangoApp/restricted.html', {})
+
+
+def track_url(request):
+    page_id = None
+    url = '/RangoApp/'
+    if request.method == 'GET':
+        page_id = request.GET['page_id']
+        try:
+            page = Page.objects.get(id=page_id)
+            page.views = page.views + 1
+            page.save()
+            url = page.url
+        except:
+            pass
+
+    return redirect(url)
