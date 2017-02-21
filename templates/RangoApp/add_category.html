@@ -10,7 +10,8 @@
 
     <form role="form"  id="page_form" method="post" action="{% url 'add_category' %}">
         <h1 class="form-signin-heading">Add a Category</h1>
-        <!--{% csrf_token %} <!--Cross Site Request Forgery Token
+        {% csrf_token %}
+        <!-- <!--Cross Site Request Forgery Token
         {% for hidden in form.hidden_fields %}
             {{ hidden }}
         {% endfor %}
